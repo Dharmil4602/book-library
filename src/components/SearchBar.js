@@ -44,19 +44,69 @@ import Pagination from "./Pagination";
 const SearchBar = () => {
   const [query, setQuery] = useState("");
   const [books, setBooks] = useState([]);
-  // const [currentPage, setCurrentPage] = useState(1);
+  const [searchResults, setSearchResults] = useState([]);
+  const [totalResults, setTotalResults] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [currentOffset, setCurrentOffset] = useState(0);
   // const [totalPages, setTotalPages] = useState(0);
 
   const handleChange = (e) => {
     setQuery(e.target.value);
   };
 
+  //`https://openlibrary.org/search.json?q=${query}&limit=10&offset=${(currentPage - 1) * 10}`
+  //https://openlibrary.org/search.json?q=${query}
+
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
-      .get(`https://openlibrary.org/search.json?q=${query}`)
+      .get(`https://openlibrary.org/search.json?q=${query}&limit=10&offset=${currentOffset}`)
       .then((res) => {
         setBooks(res.data.docs);
+        setTotalResults(res.data.numFound);
+        setSearchResults(res.data.docs);
+        console.log(searchResults);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const handleNextClick = async () => {
+    setCurrentOffset(currentOffset + 10);
+    // const response = await axios.get(
+    //   `https://openlibrary.org//search.json?q=${query}&limit=10&offset=${currentOffset + 10}`
+    // );
+    // console.log(currentOffset);
+    
+    // setSearchResults(response.data.docs);
+    // console.log(searchResults);
+
+    axios
+      .get(`https://openlibrary.org/search.json?q=${query}&limit=10&offset=${currentOffset + 10}`)
+      .then((res) => {
+        
+        setSearchResults(res.data.docs);
+        console.log(searchResults);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const handlePrevClick = async () => {
+    setCurrentOffset(currentOffset - 10);
+    // const response = await axios.get(
+    //   `https://openlibrary.org//search.json?q=${query}&limit=10&offset=${currentOffset - 10}`
+    // );
+    // setSearchResults(response.data.docs);
+
+    axios
+      .get(`https://openlibrary.org/search.json?q=${query}&limit=10&offset=${currentOffset -10}`)
+      .then((res) => {
+        
+        setSearchResults(res.data.docs);
+        console.log(searchResults);
       })
       .catch((err) => {
         console.log(err);
@@ -84,7 +134,7 @@ const SearchBar = () => {
           </tr>
         </thead>
         <tbody>
-          {books.map((book) => (
+          {searchResults.map((book) => (
             <tr key={book.key}>
               <td>{book.title}</td>
               <td>{book.author_name && book.author_name.join(", ")}</td>
@@ -106,7 +156,24 @@ const SearchBar = () => {
           </li>
         ))}
       </ul> */}
-      <Pagination/>
+      {searchResults.length > 0 && (
+        <div>
+          <button
+            type="button"
+            onClick={handlePrevClick}
+            disabled={currentOffset === 0}
+          >
+            Prev
+          </button>
+          <button
+            type="button"
+            onClick={handleNextClick}
+            disabled={searchResults.length < 10}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };
