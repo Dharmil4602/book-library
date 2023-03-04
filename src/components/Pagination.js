@@ -5,7 +5,7 @@ const Pagination = ({ currentPage, totalPages, onNextPage, onPrevPage }) => {
   const isLastPage = currentPage === totalPages;
 
   return (
-    <div></div>
+    <div>
       <button disabled={isFirstPage} onClick={onPrevPage}>
         Previous
       </button>
