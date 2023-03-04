@@ -39,6 +39,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import "../styles/search.css";
+import Pagination from "./Pagination";
 
 const SearchBar = () => {
   const [query, setQuery] = useState("");
@@ -105,6 +106,7 @@ const SearchBar = () => {
           </li>
         ))}
       </ul> */}
+      <Pagination/>
     </div>
   );
 };
